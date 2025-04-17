@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bravus Atomic - Bravus Burguer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff0000',
+                        dark: '#1a1a1a',
+                        darker: '#000000',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: white;
+        }
+        .promotion-badge {
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+        }
+        .spicy-badge {
+            background: linear-gradient(45deg, #ff4d00, #ff0000);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-darker py-6 px-4">
+        <div class="container mx-auto">
+            <nav class="flex items-center justify-between">
+                <a href="../index.html" class="text-white hover:text-primary transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar
+                </a>
+                <h1 class="text-2xl font-bold">Bravus Burguer</h1>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Product Details -->
+            <div class="bg-darker rounded-lg overflow-hidden">
+                <div class="relative">
+                    <img src="../images/atomic.PNG" alt="Bravus Atomic" class="w-full h-96 object-cover">
+                    <div class="absolute top-4 right-4 spicy-badge px-4 py-2 rounded-full text-white font-bold">
+                        🔥 PICANTE
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <h2 class="text-3xl font-bold mb-4">Bravus Atomic</h2>
+                    
+                    <div class="mb-6">
+                        <p class="text-xl mb-2">Ingredientes:</p>
+                        <ul class="list-disc list-inside space-y-2 text-gray-300">
+                            <li>Pão artesanal</li>
+                            <li>Hambúrguer artesanal 180g</li>
+                            <li>Queijo cheddar duplo</li>
+                            <li>Bacon crocante</li>
+                            <li>Cebola caramelizada</li>
+                            <li>Jalapeños</li>
+                            <li>Molho atomic (picante)</li>
+                            <li>Pimenta defumada</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-6">
+                        <p class="text-3xl font-bold text-primary">Por R$ 26,90</p>
+                    </div>
+
+                    <!-- Quantity Controls -->
+                    <div class="flex items-center justify-center gap-4 mb-6">
+                        <button onclick="updateQuantity(-1)" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <span id="quantity" class="text-xl font-bold">1</span>
+                        <button onclick="updateQuantity(1)" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <!-- Total Price -->
+                    <div class="text-center mb-6">
+                        <p class="text-lg font-semibold">Total:</p>
+                        <p id="totalPrice" class="text-2xl font-bold text-primary">R$ 26,90</p>
+                    </div>
+
+                    <div class="bg-darker border border-primary p-4 rounded-lg mb-6">
+                        <p class="text-lg font-bold">🌶️ Nível de Picância</p>
+                        <div class="flex items-center space-x-1 mt-2">
+                            <i class="fas fa-pepper-hot text-primary"></i>
+                            <i class="fas fa-pepper-hot text-primary"></i>
+                            <i class="fas fa-pepper-hot text-primary"></i>
+                            <i class="fas fa-pepper-hot text-gray-600"></i>
+                            <i class="fas fa-pepper-hot text-gray-600"></i>
+                            <span class="ml-2 text-sm text-gray-300">(Picante Moderado)</span>
+                        </div>
+                    </div>
+
+                    <!-- Adicionais Section -->
+                    <div class="mb-6">
+                        <h3 class="text-xl font-bold mb-4">2 Adicionais Grátis</h3>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="flex items-center space-x-2">
+                                <input type="checkbox" id="bacon" class="w-4 h-4 accent-primary">
+                                <label for="bacon">Bacon Extra</label>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="checkbox" id="jalapenos" class="w-4 h-4 accent-primary">
+                                <label for="jalapenos">Jalapeños Extra</label>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="checkbox" id="cheddar" class="w-4 h-4 accent-primary">
+                                <label for="cheddar">Cheddar Extra</label>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <input type="checkbox" id="molho" class="w-4 h-4 accent-primary">
+                                <label for="molho">Molho Atomic Extra</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning -->
+                    <div class="bg-red-900/30 p-4 rounded-lg mb-6">
+                        <p class="text-sm">
+                            <i class="fas fa-exclamation-triangle text-primary mr-2"></i>
+                            Atenção: Este hambúrguer contém ingredientes picantes. Recomendado para amantes de comida apimentada.
+                        </p>
+                    </div>
+
+                    <!-- Order Button -->
+                    <button onclick="saveProductDetails('Bravus Atomic', 26.90, parseInt(document.getElementById('quantity').textContent)); window.location.href='../checkout.html';" class="w-full bg-primary hover:bg-red-600 text-white font-bold py-4 px-6 rounded-lg transition duration-300">
+                        Fazer Pedido
+                    </button>
+
+                    <script>
+                        function updateQuantity(change) {
+                            const quantityElement = document.getElementById('quantity');
+                            const totalPriceElement = document.getElementById('totalPrice');
+                            const basePrice = 26.90;
+                            
+                            let quantity = parseInt(quantityElement.textContent) + change;
+                            quantity = Math.max(1, quantity); // Minimum quantity is 1
+                            
+                            quantityElement.textContent = quantity;
+                            totalPriceElement.textContent = `R$ ${(basePrice * quantity).toFixed(2)}`;
+                        }
+                    </script>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-darker p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-clock mr-2 text-primary"></i>
+                        Tempo de Preparo
+                    </h3>
+                    <p class="text-gray-300">20-25 minutos</p>
+                </div>
+
+                <div class="bg-darker p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-motorcycle mr-2 text-primary"></i>
+                        Entrega
+                    </h3>
+                    <p class="text-gray-300">Entrega Grátis</p>
+                </div>
+
+                <div class="bg-darker p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-fire-alt mr-2 text-primary"></i>
+                        Especialidade
+                    </h3>
+                    <p class="text-gray-300">Sabor Intenso e Picante</p>
+                </div>
+            </div>
+
+            <!-- Nutritional Information -->
+            <div class="mt-8 bg-darker p-6 rounded-lg">
+                <h3 class="text-xl font-bold mb-4">Informação Nutricional</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <p class="font-bold text-primary">520</p>
+                        <p class="text-sm text-gray-300">Calorias</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold text-primary">35g</p>
+                        <p class="text-sm text-gray-300">Proteínas</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold text-primary">30g</p>
+                        <p class="text-sm text-gray-300">Gorduras</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold text-primary">38g</p>
+                        <p class="text-sm text-gray-300">Carboidratos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-darker py-8 px-4 mt-12">
+        <div class="container mx-auto text-center">
+            <p class="text-gray-400">© 2024 Bravus Burguer. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+    <script src="../js/product.js"></script>
+</body>
+</html>
