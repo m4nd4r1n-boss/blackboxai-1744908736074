@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Combo Bravus Casal - Bravus Burguer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff0000',
+                        dark: '#1a1a1a',
+                        darker: '#000000',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: white;
+        }
+        .promotion-badge {
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-darker py-6 px-4">
+        <div class="container mx-auto">
+            <nav class="flex items-center justify-between">
+                <a href="/index.html" class="text-white hover:text-primary transition">
+                    <i class="fas fa-arrow-left mr-2"></i> Voltar
+                </a>
+                <h1 class="text-2xl font-bold">Bravus Burguer</h1>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Product Details -->
+            <div class="bg-darker rounded-lg overflow-hidden">
+                <img src="/images/casal.jpg" alt="Combo Bravus Casal" class="w-full h-96 object-cover">
+                
+                <div class="p-6">
+                    <h2 class="text-3xl font-bold mb-4">Combo Bravus Casal</h2>
+                    
+                    <div class="mb-6">
+                        <p class="text-xl mb-2">O que vem no combo:</p>
+                        <ul class="list-disc list-inside space-y-2 text-gray-300">
+                            <li>2 Bravus Duplo Bacon</li>
+                            <li>2 Batatas 200g</li>
+                            <li>2 Refrigerantes 350ml</li>
+                        </ul>
+                    </div>
+
+                    <div class="mb-6">
+                        <p class="text-lg text-gray-400 line-through">De R$ 75,80</p>
+                        <p class="text-3xl font-bold text-primary">Por R$ 32,90</p>
+                        <p class="text-sm text-gray-400 mt-2">Economia de R$ 42,90</p>
+                    </div>
+
+                    <div class="promotion-badge p-4 rounded-lg mb-6">
+                        <p class="text-lg font-bold">🔥 Promoção por tempo limitado!</p>
+                        <p class="text-sm">Perfeito para um jantar romântico a dois</p>
+                    </div>
+
+                    <!-- Drink Selection -->
+                    <div class="mb-6 space-y-4">
+                        <label class="block text-lg font-semibold mb-3">Escolha suas bebidas:</label>
+                        
+                        <!-- First Drink -->
+                        <div>
+                            <label class="block text-sm text-gray-300 mb-2">Bebida 1:</label>
+                            <select id="drinkSelect1" class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg p-4 focus:outline-none focus:border-primary">
+                                <option value="">Selecione sua bebida</option>
+                                <option value="guarana">Guaraná Antarctica</option>
+                                <option value="fanta">Fanta Laranja</option>
+                                <option value="coca">Coca-Cola</option>
+                                <option value="guarana-zero">Guaraná Antarctica Zero</option>
+                                <option value="fanta-zero">Fanta Zero</option>
+                                <option value="coca-zero">Coca-Cola Zero</option>
+                            </select>
+                        </div>
+
+                        <!-- Second Drink -->
+                        <div>
+                            <label class="block text-sm text-gray-300 mb-2">Bebida 2:</label>
+                            <select id="drinkSelect2" class="w-full bg-gray-800 text-white border border-gray-700 rounded-lg p-4 focus:outline-none focus:border-primary">
+                                <option value="">Selecione sua bebida</option>
+                                <option value="guarana">Guaraná Antarctica</option>
+                                <option value="fanta">Fanta Laranja</option>
+                                <option value="coca">Coca-Cola</option>
+                                <option value="guarana-zero">Guaraná Antarctica Zero</option>
+                                <option value="fanta-zero">Fanta Zero</option>
+                                <option value="coca-zero">Coca-Cola Zero</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Quantity Controls -->
+                    <div class="flex items-center justify-center gap-4 mb-6">
+                        <button onclick="updateQuantity(-1)" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <span id="quantity" class="text-xl font-bold">1</span>
+                        <button onclick="updateQuantity(1)" class="bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+
+                    <!-- Total Price -->
+                    <div class="text-center mb-6">
+                        <p class="text-lg font-semibold">Total:</p>
+                        <p id="totalPrice" class="text-2xl font-bold text-primary">R$ 32,90</p>
+                    </div>
+
+                    <!-- Order Button -->
+                    <button id="orderButton" class="w-full bg-primary hover:bg-red-600 text-white font-bold py-4 px-6 rounded-lg transition duration-300">
+                        Fazer Pedido
+                    </button>
+
+                    <script>
+                        // Initialize all functionality when DOM is loaded
+                        document.addEventListener('DOMContentLoaded', function() {
+                            // Order button handler
+                            document.getElementById('orderButton').addEventListener('click', function(e) {
+                                e.preventDefault();
+                                const drinkSelect1 = document.getElementById('drinkSelect1');
+                                const drinkSelect2 = document.getElementById('drinkSelect2');
+                                if (!drinkSelect1.value || !drinkSelect2.value) {
+                                    alert('Por favor, selecione as duas bebidas antes de continuar.');
+                                    return;
+                                }
+                                saveProductDetails('Combo Bravus Casal', 32.90, parseInt(document.getElementById('quantity').textContent));
+                                window.location.href = '/checkout.html';
+                            });
+                        });
+
+                        function updateQuantity(change) {
+                            const quantityElement = document.getElementById('quantity');
+                            const totalPriceElement = document.getElementById('totalPrice');
+                            const basePrice = 32.90;
+                            
+                            let quantity = parseInt(quantityElement.textContent) + change;
+                            quantity = Math.max(1, quantity); // Minimum quantity is 1
+                            
+                            quantityElement.textContent = quantity;
+                            totalPriceElement.textContent = `R$ ${(basePrice * quantity).toFixed(2)}`;
+                        }
+                    </script>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-darker p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-clock mr-2 text-primary"></i>
+                        Tempo de Preparo
+                    </h3>
+                    <p class="text-gray-300">25-35 minutos</p>
+                </div>
+
+                <div class="bg-darker p-6 rounded-lg">
+                    <h3 class="text-xl font-bold mb-4">
+                        <i class="fas fa-motorcycle mr-2 text-primary"></i>
+                        Entrega
+                    </h3>
+                    <p class="text-gray-300">Entrega Grátis</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-darker py-8 px-4 mt-12">
+        <div class="container mx-auto text-center">
+            <p class="text-gray-400">© 2024 Bravus Burguer. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="/script.js"></script>
+    <script src="/js/product.js"></script>
+</body>
+</html>
