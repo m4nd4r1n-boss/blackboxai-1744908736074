@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gerador de Pix - Bravus Burguer</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+    input, button { margin: 8px 0; padding: 10px; width: 100%; font-size: 16px; }
+    textarea { width: 100%; height: 120px; margin-top: 10px; font-size: 14px; }
+    #qrcode { margin-top: 20px; text-align: center; }
+    label { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <h1>Pagamento via Pix - Bravus Burguer</h1>
+
+  <label>Valor (opcional):</label>
+  <input type="text" id="amount" placeholder="ex: 50.00">
+
+  <label>Identificador ou descrição:</label>
+  <input type="text" id="txid" placeholder="ex: Pedido123">
+
+  <button onclick="generatePix()">Gerar Código Pix + QR Code</button>
+
+  <label>Código Pix Copia e Cola:</label>
+  <textarea id="pixCode" readonly></textarea>
+
+  <div id="qrcode"></div>
+
+  <script>
+    const pixKey = "62981674662";
+    const receiverName = "Nayro Cintra";
+
+    function generatePix() {
+      const amount = document.getElementById('amount').value.trim();
+      const txid = document.getElementById('txid').value.trim() || "TX123";
+
+      const payload = createPixPayload({
+        pixKey: pixKey,
+        merchantName: receiverName,
+        amount: amount,
+        txid: txid
+      });
+
+      document.getElementById('pixCode').value = payload;
+
+      const qrDiv = document.getElementById("qrcode");
+      qrDiv.innerHTML = ""; // limpa QR anterior
+      new QRCode(qrDiv, {
+        text: payload,
+        width: 256,
+        height: 256
+      });
+    }
+
+    function createPixPayload({pixKey, merchantName, amount, txid}) {
+      function format(id, value) {
+        const size = value.length.toString().padStart(2, '0');
+        return `${id}${size}${value}`;
+      }
+
+      const gui = format("00", "br.gov.bcb.pix");
+      const keyField = format("01", pixKey);
+      const merchantAccount = format("26", gui + keyField);
+      const merchantCatCode = format("52", "0000");
+      const currency = format("53", "986");
+      const value = amount ? format("54", amount) : "";
+      const countryCode = format("58", "BR");
+      const name = format("59", merchantName.substring(0, 25));
+      const city = format("60", "GOIANIA");
+      const id = format("62", format("05", txid));
+
+      const payloadSemCRC = format("00", "01") +
+        merchantAccount +
+        merchantCatCode +
+        currency +
+        value +
+        countryCode +
+        name +
+        city +
+        id +
+        "6304";
+
+      const crc = crc16(payloadSemCRC);
+      return payloadSemCRC + crc;
+    }
+
+    function crc16(payload) {
+      let polinomio = 0x1021;
+      let resultado = 0xFFFF;
+
+      for (let i = 0; i < payload.length; i++) {
+        resultado ^= payload.charCodeAt(i) << 8;
+        for (let j = 0; j < 8; j++) {
+          if ((resultado & 0x8000) !== 0) {
+            resultado = (resultado << 1) ^ polinomio;
+          } else {
+            resultado <<= 1;
+          }
+          resultado &= 0xFFFF;
+        }
+      }
+
+      return resultado.toString(16).toUpperCase().padStart(4, '0');
+    }
+  </script>
+
+</body>
+</html>
