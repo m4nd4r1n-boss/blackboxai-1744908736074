@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bravus Burguer - Localização</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff0000',
+                        dark: '#1a1a1a',
+                        darker: '#000000',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="max-w-md mx-auto w-full flex-grow flex flex-col justify-center">
+        <!-- Logo and Title -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold mb-4">Bravus Burguer</h1>
+            <p class="text-xl">
+                Encontre a unidade mais próxima de você! 🍔
+            </p>
+        </div>
+
+        <!-- Location Selection -->
+        <div class="bg-dark rounded-xl p-6 shadow-2xl border border-gray-800">
+            <div class="space-y-6">
+                <!-- State Selection -->
+                <div>
+                    <label class="block text-lg font-semibold mb-3 text-center">Escolha seu estado</label>
+                    <select id="stateSelect" class="w-full h-14 px-4 rounded-lg bg-darker text-white border border-gray-700 focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none text-lg">
+                        <option value="">Selecione um estado</option>
+                    </select>
+                </div>
+
+                <!-- City Selection -->
+                <div id="cityContainer" class="hidden">
+                    <label class="block text-lg font-semibold mb-3 text-center">Escolha sua cidade</label>
+                    <select id="citySelect" class="w-full h-14 px-4 rounded-lg bg-darker text-white border border-gray-700 focus:border-primary focus:ring-2 focus:ring-primary focus:outline-none text-lg">
+                        <option value="">Selecione uma cidade</option>
+                    </select>
+                </div>
+
+                <!-- Next Button -->
+                <button id="nextButton" class="w-full gradient-bg text-white py-4 px-6 rounded-lg text-xl font-bold hidden transform transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-darker">
+                    Próximo
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Delivery Info -->
+        <div class="mt-6 text-center text-gray-400">
+            <p class="flex items-center justify-center gap-2">
+                <i class="fas fa-motorcycle text-primary"></i>
+                Entrega Grátis
+            </p>
+            <p class="flex items-center justify-center gap-2 mt-2">
+                <i class="fas fa-clock text-primary"></i>
+                30-50 min
+            </p>
+        </div>
+    </div>
+
+    <script src="data/brasil.json"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('./data/brasil.json');
+                const brasilData = await response.json();
+                
+                const stateSelect = document.getElementById('stateSelect');
+                const cityContainer = document.getElementById('cityContainer');
+                const citySelect = document.getElementById('citySelect');
+                const nextButton = document.getElementById('nextButton');
+
+                // Populate states
+                Object.entries(brasilData)
+                    .sort((a, b) => a[1].nome.localeCompare(b[1].nome))
+                    .forEach(([uf, data]) => {
+                        const option = document.createElement('option');
+                        option.value = uf;
+                        option.textContent = data.nome;
+                        stateSelect.appendChild(option);
+                    });
+
+                // State selection handler
+                stateSelect.addEventListener('change', (e) => {
+                    const selectedState = e.target.value;
+                    
+                    if (selectedState) {
+                        citySelect.innerHTML = '<option value="">Selecione uma cidade</option>';
+                        
+                        brasilData[selectedState].cidades.forEach(cidade => {
+                            const option = document.createElement('option');
+                            option.value = cidade;
+                            option.textContent = cidade;
+                            citySelect.appendChild(option);
+                        });
+                        
+                        cityContainer.classList.remove('hidden');
+                        cityContainer.classList.add('animate-fade-in');
+                    } else {
+                        cityContainer.classList.add('hidden');
+                        nextButton.classList.add('hidden');
+                    }
+                });
+
+                // City selection handler
+                citySelect.addEventListener('change', (e) => {
+                    if (e.target.value) {
+                        nextButton.classList.remove('hidden');
+                        nextButton.classList.add('animate-fade-in');
+                    } else {
+                        nextButton.classList.add('hidden');
+                    }
+                });
+
+                // Next button handler
+                nextButton.addEventListener('click', () => {
+                    const state = stateSelect.value;
+                    const city = citySelect.value;
+                    
+                    if (state && city) {
+                        localStorage.setItem('selectedLocation', JSON.stringify({
+                            state: brasilData[state].nome,
+                            city: city
+                        }));
+                        window.location.href = 'index.html';
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading location data:', error);
+            }
+        });
+    </script>
+</body>
+</html>
