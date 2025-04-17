@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagamento Pix - Bravus Burguer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="js/pix.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .glass-effect {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="w-full max-w-md">
+        <!-- Main Card -->
+        <div class="glass-effect rounded-3xl shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="p-8 text-center">
+                <h1 class="text-3xl font-bold text-white mb-4">Pagamento via Pix</h1>
+                <div class="text-white text-5xl font-bold mb-4 pulse">R$ 10,00</div>
+                <div class="flex justify-center items-center gap-2 text-white opacity-75">
+                    <i class="fas fa-clock"></i>
+                    <span>Aguardando pagamento</span>
+                </div>
+            </div>
+
+            <!-- QR Code Section -->
+            <div class="p-6">
+                <div class="bg-white rounded-2xl p-6 mb-6 mx-auto max-w-xs">
+                    <div id="qrcode" class="flex justify-center"></div>
+                    <p class="text-center text-gray-600 text-sm mt-4">
+                        Escaneie o QR Code para pagar
+                    </p>
+                </div>
+
+                <!-- Copy Code Section -->
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-white text-sm">Código Pix</span>
+                        <button onclick="copyPixCode()" class="bg-white bg-opacity-20 hover:bg-opacity-30 text-white px-4 py-2 rounded-lg transition-all">
+                            <i class="fas fa-copy mr-2"></i>Copiar código
+                        </button>
+                    </div>
+                    <textarea id="pixCode" class="w-full bg-black bg-opacity-50 border border-white border-opacity-20 rounded-xl p-4 text-white text-sm" readonly rows="3"></textarea>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="p-6">
+                <div class="grid grid-cols-1 gap-6">
+                    <div class="flex items-center gap-4 text-white">
+                        <div class="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-xl">1</div>
+                        <span>Abra o app do seu banco</span>
+                    </div>
+                    <div class="flex items-center gap-4 text-white">
+                        <div class="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-xl">2</div>
+                        <span>Escolha pagar via Pix</span>
+                    </div>
+                    <div class="flex items-center gap-4 text-white">
+                        <div class="w-10 h-10 rounded-full bg-white bg-opacity-20 flex items-center justify-center text-xl">3</div>
+                        <span>Escaneie o QR Code ou cole o código</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center text-white">
+            <p class="text-sm opacity-75">Seu pedido será confirmado automaticamente após o pagamento</p>
+            <a href="index.html" class="inline-block mt-4 text-white hover:text-gray-200 transition-colors">
+                <i class="fas fa-arrow-left mr-2"></i>Voltar ao cardápio
+            </a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const qrcodeElement = document.getElementById('qrcode');
+            const copyPasteElement = document.getElementById('pixCode');
+            
+            window.pixQRCode = new PixQRCode({
+                amount: 10.00,
+                qrCodeElement: qrcodeElement,
+                copyPasteElement: copyPasteElement
+            });
+        });
+    </script>
+</body>
+</html>
