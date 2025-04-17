@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bravus Burguer - Faça seu pedido!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#ff0000',
+                        dark: '#1a1a1a',
+                        darker: '#000000',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000;
+            color: white;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: all 0.3s ease;
+        }
+        .modal {
+            background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+        .modal select {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            background-color: rgba(0, 0, 0, 0.3);
+            color: white;
+            font-size: 1.1rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.5em;
+        }
+        .modal select:focus {
+            outline: none;
+            border-color: white;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+        }
+        .modal select option {
+            background-color: #1a1a1a;
+            color: white;
+            padding: 1rem;
+        }
+        .modal button {
+            background-color: white;
+            color: #ff0000;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 100%;
+            transition: transform 0.2s ease, background-color 0.2s ease;
+        }
+        .modal button:hover {
+            transform: scale(1.02);
+            background-color: rgba(255, 255, 255, 0.9);
+        }
+        .location-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #1a1a1a;
+            margin-bottom: 1rem;
+        }
+        .location-info i {
+            color: #ff0000;
+        }
+        .promotion-timer {
+            background: linear-gradient(45deg, #ff0000, #cc0000);
+        }
+        .product-card {
+            transition: transform 0.3s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <!-- Location Modal -->
+    <div id="locationModal" class="modal-overlay">
+        <div class="modal">
+            <!-- Header -->
+            <div class="mb-8">
+                <i class="fas fa-map-marker-alt text-4xl mb-4"></i>
+                <h2 class="text-3xl font-bold">Procure a loja mais próxima de você!</h2>
+                <p class="text-white text-opacity-80 mt-2">Escolha seu estado e cidade para continuar</p>
+            </div>
+
+            <!-- Selection Area -->
+            <div class="flex flex-col space-y-6">
+                <div class="relative">
+                    <select id="stateSelect" class="w-full h-14 px-4 rounded-xl bg-black bg-opacity-50 text-white border border-white border-opacity-20 focus:border-white focus:ring-2 focus:ring-white focus:outline-none text-lg">
+                        <option value="">Selecione seu estado</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-opacity-50"></i>
+                </div>
+
+                <div id="cityContainer" class="relative" style="display: none;">
+                    <select id="citySelect" class="w-full h-14 px-4 rounded-xl bg-black bg-opacity-50 text-white border border-white border-opacity-20 focus:border-white focus:ring-2 focus:ring-white focus:outline-none text-lg">
+                        <option value="">Selecione sua cidade</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute right-4 top-1/2 transform -translate-y-1/2 text-white text-opacity-50"></i>
+                </div>
+
+                <button id="nextButton" class="w-full h-14 bg-white text-red-600 rounded-xl text-xl font-bold hidden transform transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white">
+                    Próximo
+                    <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+
+            <!-- Delivery Info -->
+            <div class="mt-8 flex justify-center gap-6 text-white text-opacity-80">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-motorcycle text-2xl"></i>
+                    <span>Entrega Grátis</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-clock text-2xl"></i>
+                    <span>30-50 min</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <header class="bg-darker py-6 px-4 text-center">
+        <!-- Location Info -->
+        <div id="locationInfo" class="bg-dark py-2 px-4 mb-6 rounded-lg" style="display: none;">
+            <div class="container mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-map-marker-alt text-green-600"></i>
+                    <span id="selectedLocation" class="font-bold text-lg"></span>
+                </div>
+                <div class="flex items-center gap-4 text-sm text-gray-300">
+                    <span>Pedido Mínimo R$ 10,00 • 30-50 min • Entrega Grátis • 1,6km de você</span>
+                    <div class="flex items-center gap-1">
+                        <span class="text-yellow-400"><i class="fas fa-star"></i></span>
+                        <span>4,9 (2.136 avaliações)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container mx-auto">
+            <h1 class="text-3xl font-bold mb-4">Bravus Burguer</h1>
+            <p class="text-lg mb-4">
+                Aproveite nossa <span class="font-bold">promoção com preços irresistíveis</span> igual Hamburguer 🖤
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+
+        <!-- Timer -->
+        <div class="promotion-timer text-center p-4 rounded-lg mb-8">
+            <p class="text-lg mb-2">A promoção vai acabar em:</p>
+            <div class="flex justify-center gap-4">
+                <div>
+                    <span id="minutes" class="text-4xl font-bold">29</span>
+                    <p class="text-sm">Minutos</p>
+                </div>
+                <div>
+                    <span id="seconds" class="text-4xl font-bold">08</span>
+                    <p class="text-sm">Segundos</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combos Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Combos</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Combo Individual -->
+                <a href="/produtos/bravusindividual.html" class="product-card bg-darker rounded-lg overflow-hidden">
+                    <img src="/images/individual.jpg" alt="Combo Bravus Individual" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2">Combo Bravus Individual</h3>
+                        <p class="mb-2">Bravus Duplo Cheddar + Batata 200g + Refri 350ml</p>
+                        <p class="text-sm line-through text-gray-400">de R$ 39,80</p>
+                        <p class="text-xl font-bold text-primary">por R$ 22,90</p>
+                    </div>
+                </a>
+
+                <!-- Combo Casal -->
+                <a href="/produtos/bravuscomboduplo.html" class="product-card bg-darker rounded-lg overflow-hidden">
+                    <img src="/images/casal.jpg" alt="Combo Bravus Casal" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2">Combo Bravus Casal</h3>
+                        <p class="mb-2">2 Bravus Duplo Bacon + 2 Batatas 200g + 2 Refrigerante 350ml</p>
+                        <p class="text-sm line-through text-gray-400">de R$ 75,80</p>
+                        <p class="text-xl font-bold text-primary">por R$ 32,90</p>
+                    </div>
+                </a>
+
+                <!-- Combo Familia -->
+                <a href="/produtos/bravuscombofamilia.html" class="product-card bg-yellow-500 rounded-lg overflow-hidden relative">
+                    <div class="absolute top-0 right-0 bg-primary text-white px-3 py-1 rounded-bl-lg">
+                        MAIS VENDIDO 🖤
+                    </div>
+                    <img src="/images/familia.png" alt="Combo Bravus Familia" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2">Combo Bravus Familia</h3>
+                        <p class="mb-2">4 Bravus Duplo Bacon + Batata 500g + Refrigerante 2L</p>
+                        <p class="text-sm line-through text-gray-400">de R$ 75,90</p>
+                        <p class="text-xl font-bold text-primary">por R$ 57,90</p>
+                        <p class="text-sm mt-2 text-gray-300">A maioria dos clientes escolhe esse porque é o melhor custo-benefício! 🔥</p>
+                        <p class="text-sm text-primary">Apenas 8 combo(s) com esse preço especial</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Hamburger Artesanal Section -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold mb-6">Hamburguer Artesanal</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Classic Bravus -->
+                <a href="/produtos/classic.html" class="product-card bg-darker rounded-lg overflow-hidden">
+                    <img src="/images/classic.jpg" alt="Classic Bravus" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2">Classic Bravus</h3>
+                        <p class="mb-2">2 Adicionais Grátis</p>
+                        <p class="text-xl font-bold text-primary">por R$ 15,90</p>
+                    </div>
+                </a>
+
+                <!-- Bravus Salada -->
+                <a href="/produtos/salad.html" class="product-card bg-darker rounded-lg overflow-hidden">
+                    <img src="/images/salad.jpg" alt="Bravus Salada" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2">Bravus Salada</h3>
+                        <p class="mb-2">2 Adicionais Grátis</p>
+                        <p class="text-xl font-bold text-primary">por R$ 22,90</p>
+                    </div>
+                </a>
+
+                <!-- Bravus Atomic -->
+                <a href="/produtos/atomic.html" class="product-card bg-darker rounded-lg overflow-hidden">
+                    <img src="/images/atomic.png" alt="Bravus Atomic" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2">Bravus Atomic</h3>
+                        <p class="mb-2">2 Adicionais Grátis</p>
+                        <p class="text-xl font-bold text-primary">por R$ 26,90</p>
+                    </div>
+                </a>
+
+                <!-- Bravus Duplo Onion -->
+                <a href="/produtos/duploonion.html" class="product-card bg-darker rounded-lg overflow-hidden">
+                    <img src="/images/duplo.png" alt="Bravus Duplo Onion" class="w-full h-48 object-cover">
+                    <div class="p-4">
+                        <h3 class="text-xl font-bold mb-2">Bravus Duplo Onion</h3>
+                        <p class="mb-2">2 Adicionais Grátis</p>
+                        <p class="text-xl font-bold text-primary">por R$ 27,90</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Reviews Section -->
+        <section class="mb-12">
+            <div class="flex items-center justify-center mb-6">
+                <div class="text-4xl font-bold text-primary">4,8</div>
+                <div class="ml-4">
+                    <div class="flex text-primary text-xl mb-1">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <p class="text-gray-300">136 avaliações • últimos 90 dias</p>
+                    <p class="text-gray-300">1.007 avaliações no total</p>
+                </div>
+            </div>
+
+            <!-- Review Cards Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Cinthia -->
+                <div class="bg-darker rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">Cinthia</h3>
+                        <span class="text-primary">5,0</span>
+                        <div class="text-primary">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="mb-4">Surpreendentemente gostoso.</p>
+                    <img src="/images/reviews/r1.jpg" alt="Review by Cinthia - Burger Box" class="w-full h-48 object-cover rounded-lg">
+                </div>
+
+                <!-- Lucas -->
+                <div class="bg-darker rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">Lucas</h3>
+                        <span class="text-primary">5,0</span>
+                        <div class="text-primary">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="mb-4">Sinceramente? Melhor custo-benefício que já vi! Lanche bom, preço sensacional e entrega rápida.</p>
+                    <img src="/images/reviews/r2.jpg" alt="Review by Lucas - Burger with Cheese" class="w-full h-48 object-cover rounded-lg">
+                </div>
+
+                <!-- Luiza -->
+                <div class="bg-darker rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">Luiza</h3>
+                        <span class="text-primary">5,0</span>
+                        <div class="text-primary">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="mb-4">A batata frita estava maravilhosa, bem sequinha, perfeita, com um molho gostoso de alho, não deixe de experimentar... Os hambúrgueres também estavam muito bons, a carne no ponto perfeito. Pedirei mais vezes</p>
+                    <img src="/images/reviews/r3.jpg" alt="Review by Luiza - Classic Burger" class="w-full h-48 object-cover rounded-lg">
+                </div>
+
+                <!-- Ronald -->
+                <div class="bg-darker rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">Ronald</h3>
+                        <span class="text-primary">5,0</span>
+                        <div class="text-primary">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="mb-4">Quando vi o preço achei q ia ser pequeno, mas me enganei! a qualidade é absurda.</p>
+                    <img src="/images/reviews/r4.jpg" alt="Review by Ronald - Double Burger" class="w-full h-48 object-cover rounded-lg">
+                </div>
+
+                <!-- Carlla -->
+                <div class="bg-darker rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">Carlla</h3>
+                        <span class="text-primary">5,0</span>
+                        <div class="text-primary">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="mb-4">A comida fresquinha, saborosa, chegou rapidamente e estava quentinha!</p>
+                    <img src="/images/reviews/r5.jpg" alt="Review by Carlla - Burger with Bun" class="w-full h-48 object-cover rounded-lg">
+                </div>
+
+                <!-- Gregory -->
+                <div class="bg-darker rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">Gregory</h3>
+                        <span class="text-primary">5,0</span>
+                        <div class="text-primary">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="mb-4">Uma delícia como sempre a comida, parabéns para o pessoal da cozinha.</p>
+                    <img src="/images/reviews/r6.jpg" alt="Review by Gregory - Bravus Atomic" class="w-full h-48 object-cover rounded-lg">
+                </div>
+
+                <!-- Jussara -->
+                <div class="bg-darker rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">Jussara</h3>
+                        <span class="text-primary">5,0</span>
+                        <div class="text-primary">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="mb-4">Bom, barato e entrega rápida. Não tem erro, semana que vem peço de novo</p>
+                    <img src="/images/reviews/r7.jpg" alt="Review by Jussara - Burger with Fries" class="w-full h-48 object-cover rounded-lg">
+                </div>
+
+                <!-- Julia -->
+                <div class="bg-darker rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">Julia</h3>
+                        <span class="text-primary">5,0</span>
+                        <div class="text-primary">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="mb-4">Pedi pela primeira vez e td mundo gostou, vamos pedir mais!</p>
+                    <img src="/images/reviews/r8.jpg" alt="Review by Julia - Burger with Sauce" class="w-full h-48 object-cover rounded-lg">
+                </div>
+
+                <!-- Jussara (Second Review) -->
+                <div class="bg-darker rounded-lg p-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <h3 class="font-bold">Jussara</h3>
+                        <span class="text-primary">5,0</span>
+                        <div class="text-primary">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                    </div>
+                    <p class="mb-4">Burguer top, amei</p>
+                    <img src="/images/reviews/r9.jpg" alt="Review by Jussara - Burger Close-up" class="w-full h-48 object-cover rounded-lg">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-darker py-8 px-4">
+        <div class="container mx-auto flex flex-col items-center text-center">
+            <div class="mb-6">
+                <h3 class="text-xl font-bold mb-4">Tipos de Entrega</h3>
+                <ul class="space-y-2">
+                    <li>Entrega Motoboy</li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-xl font-bold mb-4">Formas de Pagamento</h3>
+                <ul class="space-y-2">
+                    <li>Pix</li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Countdown Timer
+        function updateTimer() {
+            const minutesElement = document.getElementById('minutes');
+            const secondsElement = document.getElementById('seconds');
+            
+            let minutes = parseInt(minutesElement.textContent);
+            let seconds = parseInt(secondsElement.textContent);
+            
+            const timer = setInterval(() => {
+                if (seconds > 0) {
+                    seconds--;
+                } else if (minutes > 0) {
+                    minutes--;
+                    seconds = 59;
+                } else {
+                    clearInterval(timer);
+                    return;
+                }
+                
+                minutesElement.textContent = minutes.toString().padStart(2, '0');
+                secondsElement.textContent = seconds.toString().padStart(2, '0');
+            }, 1000);
+        }
+
+        // Location Modal Functionality
+        let brasilData = null;
+
+        async function loadLocationData() {
+            try {
+                console.log('Fetching location data...');
+                const response = await fetch('/data/brasil.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                brasilData = await response.json();
+                console.log('Location data loaded:', brasilData);
+                
+                // Populate states dropdown
+                const stateSelect = document.getElementById('stateSelect');
+                console.log('State select element:', stateSelect);
+                
+                // Sort states by name
+                const sortedStates = Object.entries(brasilData)
+                    .sort((a, b) => a[1].nome.localeCompare(b[1].nome));
+                
+                console.log('Sorted states:', sortedStates);
+                
+                sortedStates.forEach(([uf, data]) => {
+                    const option = document.createElement('option');
+                    option.value = uf;
+                    option.textContent = data.nome;
+                    stateSelect.appendChild(option);
+                    console.log(`Added state: ${data.nome} (${uf})`);
+                });
+            } catch (error) {
+                console.error('Error loading location data:', error);
+            }
+        }
+
+
+        function updateLocationDisplay(state, city) {
+            const locationInfo = document.getElementById('locationInfo');
+            const selectedLocation = document.getElementById('selectedLocation');
+            selectedLocation.textContent = `${city}, ${brasilData[state].nome}`;
+            locationInfo.style.display = 'flex';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTimer();
+            loadLocationData();
+
+            // Event Listeners
+            const stateSelect = document.getElementById('stateSelect');
+            
+            // Update modal styles
+            const modal = document.getElementById('locationModal');
+            modal.classList.add('backdrop-blur-sm');
+            const modalContent = modal.querySelector('.modal');
+            modalContent.classList.add('bg-gradient-to-br', 'from-red-600', 'to-red-800', 'text-white');
+
+            // State selection handler
+            stateSelect.addEventListener('change', (e) => {
+                const selectedState = e.target.value;
+                console.log('State selected:', selectedState);
+                
+                const cityContainer = document.getElementById('cityContainer');
+                const citySelect = document.getElementById('citySelect');
+                const nextButton = document.getElementById('nextButton');
+                
+                if (selectedState) {
+                    console.log('Selected state data:', brasilData[selectedState]);
+                    console.log('Cities for state:', brasilData[selectedState].cidades);
+                    
+                    citySelect.innerHTML = '<option value="">Selecione uma cidade</option>';
+                    
+                    brasilData[selectedState].cidades.forEach(cidade => {
+                        const option = document.createElement('option');
+                        option.value = cidade;
+                        option.textContent = cidade;
+                        citySelect.appendChild(option);
+                        console.log('Added city:', cidade);
+                    });
+                    
+                    cityContainer.style.display = 'block';
+                    nextButton.style.display = 'none';
+                } else {
+                    console.log('No state selected');
+                    cityContainer.style.display = 'none';
+                    nextButton.style.display = 'none';
+                }
+            });
+
+            // City selection handler
+            const citySelect = document.getElementById('citySelect');
+            const nextButton = document.getElementById('nextButton');
+            let isHandlingSelection = false;
+
+            function showNextButton() {
+                if (isHandlingSelection) return;
+                isHandlingSelection = true;
+
+                requestAnimationFrame(() => {
+                    if (citySelect.value) {
+                        console.log('City selected:', citySelect.value);
+                        nextButton.style.cssText = 'display: block; margin: 0 auto; opacity: 1;';
+                    } else {
+                        nextButton.style.display = 'none';
+                    }
+                    isHandlingSelection = false;
+                });
+            }
+
+            // Handle city selection
+            citySelect.addEventListener('change', showNextButton);
+            citySelect.addEventListener('click', (e) => {
+                if (e.target.tagName === 'OPTION' && e.target.value) {
+                    showNextButton();
+                }
+            });
+
+            // Show button when city container becomes visible
+            const cityContainer = document.getElementById('cityContainer');
+            new MutationObserver(() => {
+                if (cityContainer.style.display !== 'none' && citySelect.value) {
+                    showNextButton();
+                }
+            }).observe(cityContainer, { attributes: true });
+
+            // Next button handler
+            nextButton.addEventListener('click', () => {
+                const state = document.getElementById('stateSelect').value;
+                const city = document.getElementById('citySelect').value;
+                
+                if (state && city) {
+                    console.log('Location selected:', city, state);
+                    
+                    // Update location info
+                    const locationInfo = document.getElementById('locationInfo');
+                    const selectedLocation = document.getElementById('selectedLocation');
+                    selectedLocation.textContent = `${city}, ${brasilData[state].nome}`;
+                    locationInfo.style.display = 'flex';
+                    
+                    // Update header text
+                    const headerLocation = document.querySelector('p.text-xl span.font-bold:last-child');
+                    if (headerLocation) {
+                        headerLocation.textContent = city;
+                    }
+                    
+                    // Hide modal with animation
+                    const modal = document.getElementById('locationModal');
+                    modal.style.opacity = '0';
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        modal.style.opacity = '1';
+                    }, 300);
+                }
+            });
+        });
+    </script>
+</body> 
+</html>
